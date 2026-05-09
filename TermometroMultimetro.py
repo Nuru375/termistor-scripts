@@ -68,7 +68,7 @@ def capturar_datos():
     
     with open(ARCHIVO_DESTINO, mode='w', newline='', buffering=1) as file:
         writer = csv.writer(file)
-        writer.writerow(["Tiempo (s)", "Resistencia (Ohm)", "Temperatura (C)"])
+        writer.writerow(["Tiempo (s)", "Temperatura (K)", "Incertidumbre (K)"])
         file.flush()
         
         print(f"Captura iniciada. Guardando en {ARCHIVO_DESTINO}...")
@@ -89,10 +89,6 @@ def capturar_datos():
                 if not linea_multimetro:
                     print("Timeout: El multímetro no respondió a tiempo.")
                 else:
-                    t_relativo = ahora - t_inicio
-                    writer.writerow([f"{t_relativo:.3f}", linea_multimetro])
-                    file.flush()
-                    
                     """Error de la medición de temperatura desde el multímetro"""
                     x = DigitalData(
                         data=float(linea_multimetro),
@@ -108,7 +104,11 @@ def capturar_datos():
                     )
                     U = np.sqrt(uA**2 + uB**2)
                     
-                    print(f"[{t_relativo:6.3f}s] T: {T_read - 273.15} +/- {U - 273.15} C")
+                    t_relativo = ahora - t_inicio
+                    writer.writerow([f"{t_relativo:.3f}", T_read, U]) # Mide en Kelvin
+                    file.flush()
+                    
+                    print(f"[{t_relativo:6.3f}s] T: {T_read - 273.15} +/- {U - 273.15} C") # En pantalla muestro en Celcius
                 
                 # Metrónomo de precisión para los 0.5s
                 next_sample += INTERVALO
