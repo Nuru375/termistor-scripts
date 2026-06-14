@@ -11,7 +11,7 @@ import scipy.stats as st
 
 class Data:
     def __init__(self, data):
-        self.data = np.array(data)
+        self.data = np.atleast_1d(data)
         # mode: 0 [univariado], 1 [bivariado (x, y)]
         self.mode = 0 if len(self.data.shape)==1 else 1
 
@@ -21,6 +21,8 @@ class Data:
     def std_mean(self):
         """Error estándar de la media (Tipo A)"""
         n = self.data.shape[1] if self.mode else len(self.data)
+        if n == 1:
+            return 0.0
         return np.std(self.data, axis=1 if self.mode else 0, ddof=1) / np.sqrt(n)
 
     def linear_fit(self, values=True, stats=False):
@@ -55,12 +57,19 @@ class DigitalData(Data):
         """Reporte rápido con propagación completa."""
         # Factor de cobertura k (t-Student)
         conf = {
+            # sigmas: confianza
             1: 0.68,
             2: 0.95,
             3: 0.997
         }
-        dof = (self.data.shape[1] if self.mode else len(self.data)) - 1
-        k = st.t.ppf(1 - (1 - conf[sigmas])/2, df=dof)
+        
+        n = self.data.shape[1] if self.mode else len(self.data)
+        dof = n - 1
+        
+        if dof > 0:
+            k = st.t.ppf(1 - (1 - conf[sigmas])/2, df=dof)
+        else:
+            k = st.norm.ppf(1 - (1 - conf[sigmas])/2)
 
         if not self.mode:
             # Caso una sola magnitud

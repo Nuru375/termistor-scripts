@@ -33,10 +33,10 @@ class HP34401A(Instrument):
                 elif "Resistance" in mode: unit = "Ohm"
                 else: unit = "A"
                 
-                if limit >= 1e6: return f"{int(limit/1e6)}M{unit}"
-                elif limit >= 1e3: return f"{int(limit/1e3)}k{unit}"
-                elif limit < 1: return f"{int(limit*1000)}m{unit}"
-                else: return f"{int(limit)}{unit}"
+                if limit >= 1e6:    return f"{int(limit/1e6)}M{unit}"
+                elif limit >= 1e3:  return f"{int(limit/1e3)}k{unit}"
+                elif limit < 1:     return f"{int(limit*1000)}m{unit}"
+                else:               return f"{int(limit)}{unit}"
         return None
 
     def calculate_error(self, value, mode, period):
