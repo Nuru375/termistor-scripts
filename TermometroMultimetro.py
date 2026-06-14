@@ -25,7 +25,9 @@ PUERTO_MULTIMETRO = 'COM9'
 INTERVALO = 0.5 # s
 BAUD_RATE = 9600
 TIMEOUT = 2 # Timeout generoso
+
 ARCHIVO_DESTINO = "nuevas_mediciones.csv"
+T_AMBIENTE = 16 # Grados Celcius
 
 multimetro = serial.Serial(
     port=PUERTO_MULTIMETRO,
@@ -89,20 +91,16 @@ def capturar_datos():
                 if not linea_multimetro:
                     print("Timeout: El multímetro no respondió a tiempo.")
                 else:
-                    """Error de la medición de temperatura desde el multímetro"""
+                    # Error de la medición de temperatura desde el multímetro
                     x = DigitalData(
                         data=float(linea_multimetro),
-                        instrument=HP34401A(T=16),
+                        instrument=HP34401A(T=T_AMBIENTE),
                         instr_mode="DC_Resistance"
                     )
                     R_read, uB = x.fast()
                     T_read = temperatura(R_read) # [K]
-                    uA = T_read*np.sqrt(
-                        (a*(-b/(np.log(R_read) - a)**2))**2
-                        + (b/(np.log(R_read) - a))**2
-                        + (R_read*b/(np.log(R_read) - a)**2*1/R_read)**2
-                    )
-                    U = np.sqrt(uA**2 + uB**2)
+                    uA = (T_read / b) * np.sqrt((T_read * uA_a)**2 + uA_b**2)
+                    U = np.sqrt( uA**2 + ( (-T_read**2 / (R_read * b)) * uB )**2 )
                     
                     t_relativo = ahora - t_inicio
                     writer.writerow([f"{t_relativo:.3f}", T_read, U]) # Mide en Kelvin
