@@ -106,7 +106,7 @@ def capturar_datos():
                     writer.writerow([f"{t_relativo:.3f}", T_read, U]) # Mide en Kelvin
                     file.flush()
                     
-                    print(f"[{t_relativo:6.3f}s] T: {T_read - 273.15} +/- {U - 273.15} C") # En pantalla muestro en Celcius
+                    print(f"[{t_relativo:6.3f}s] T: {T_read - 273.15} +/- {U} C") # En pantalla muestro en Celcius
                 
                 # Metrónomo de precisión para los 0.5s
                 next_sample += INTERVALO
