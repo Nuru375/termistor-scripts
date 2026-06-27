@@ -97,10 +97,11 @@ def capturar_datos():
                         instrument=HP34401A(T=T_AMBIENTE),
                         instr_mode="DC_Resistance"
                     )
-                    R_read, uB = x.fast()
+                    R_read, u_R = x.fast()
                     T_read = temperatura(R_read) # [K]
                     uA = (T_read / b) * np.sqrt((T_read * uA_a)**2 + uA_b**2)
-                    U = np.sqrt( uA**2 + ( (-T_read**2 / (R_read * b)) * uB )**2 )
+                    uB = (-T_read**2 / (R_read * b)) * u_R
+                    U = np.sqrt( uA**2 + uB**2 )
                     
                     t_relativo = ahora - t_inicio
                     writer.writerow([f"{t_relativo:.3f}", T_read, U]) # Mide en Kelvin
